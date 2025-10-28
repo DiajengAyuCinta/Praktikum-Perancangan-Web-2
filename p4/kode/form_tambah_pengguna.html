@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Data Pengguna</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffdbf5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-box {
+            background-color: #ffffff;
+            width: 380px;
+            border: 1px solid #000;
+            border-radius: 25px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            padding: 15px;
+            border-bottom: 1px solid #000;
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .form-body {
+            padding: 20px 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .submit-button {
+            display: block;
+            width: 100px;
+            margin: 0 auto;
+            padding: 8px 0;
+            text-align: center;
+            background-color: #fff;
+            border: 1px solid #000;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .submit-button:hover {
+            background-color: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <div class="form-header">
+            <h2>Kelola Data Pengguna</h2>
+        </div>
+        <div class="form-body">
+            <form action="proses_tambah_pengguna.php" method="post">
+                <label for="id_pengguna">id_pengguna :</label>
+                <input type="text" id="id_pengguna" name="id_pengguna" required>
+
+                <label for="username">Username :</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password :</label>
+                <input type="password" id="password" name="password" required>
+                
+                <label for="nama">nama :</label>
+                <input type="text" id="nama" name="nama" required>
+
+                <label for="role">Role :</label>
+                <select id="role" name="role" required>
+                    <option value="">-- Pilih Role --</option>
+                    <option value="mahasiswa">Mahasiswa</option>
+                    <option value="dosen">Dosen</option>
+                    <option value="kaprodi">Kaprodi</option>
+                    <option value="admin">Admin</option>
+                </select>
+
+                <button type="submit" class="submit-button">Simpan</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
