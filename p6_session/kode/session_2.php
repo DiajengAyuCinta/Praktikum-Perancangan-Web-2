@@ -1,13 +1,15 @@
 <?php
-Session_start();
-if (!isset($_SESSION["count"])){
+session_start();
+$idsession = session_id();
+if (!isset($_SESSION['count'])){
     $_SESSION['count'] = 0;
 }
-$_SESSION ['count']++;
+$_SESSION['count']++;
+$count = $_SESSION['count'];
 ?>
 <html>
     <head>
-        <title>Demo session 1</title>
+        <title>Demo Session 2 - Destroy</title>
         <style>
         body {
             background-color: #a7d3ff;
@@ -22,11 +24,12 @@ $_SESSION ['count']++;
     </style>
     </head>
     <body>
-        <h1> Demo Session 1</h1>
+         <body>
+        <h1> Demo Session 2 - Reset Nilai</h1>
         <?php
-        echo"Anda telah mengakses halaman ini sebanyak : " .$_SESSION['count']. " kali";
+        echo "ID Session : " .$idsession ."<br>";
+        echo "Anda mengakses server ini sebanyak :" .$count;
         ?>
     </body>
+    </body>
 </html>
-
-
