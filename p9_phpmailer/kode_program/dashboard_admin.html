@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - Sistem Absensi QR</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --warning: #f72585;
+      --danger: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --sidebar-width: 260px;
+      --sidebar-collapsed: 80px;
+      --header-height: 70px;
+      --card-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fb;
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 25px 0;
+      transition: var(--transition);
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      padding: 0 25px;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      background: rgba(255, 255, 255, 0.2);
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text h3 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .logo-text p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 0 25px;
+      margin-bottom: 40px;
+    }
+
+    .profile-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #4cc9f0, #4361ee);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-info h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .profile-info p {
+      font-size: 12px;
+      opacity: 0.8;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .sidebar-menu {
+      flex-grow: 1;
+      padding: 0 15px;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .sidebar-menu a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .sidebar-menu a.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-menu a i {
+      font-size: 20px;
+      width: 30px;
+    }
+
+    .menu-text {
+      transition: var(--transition);
+    }
+
+    .sidebar.collapsed .menu-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    .sidebar-footer {
+      padding: 25px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      padding: 15px 20px;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 16px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Main Content */
+    .main {
+      flex-grow: 1;
+      margin-left: var(--sidebar-width);
+      transition: var(--transition);
+      padding: 30px;
+    }
+
+    .sidebar.collapsed ~ .main {
+      margin-left: var(--sidebar-collapsed);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .header-left h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .header-left p {
+      color: var(--gray);
+      font-size: 15px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .toggle-sidebar {
+      background: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--primary);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+
+    .toggle-sidebar:hover {
+      transform: rotate(15deg);
+      background: var(--primary);
+      color: white;
+    }
+
+    .date-display {
+      background: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    /* Stats Cards */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--card-radius);
+      padding: 25px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      border-left: 5px solid var(--primary);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:nth-child(1) { border-left-color: #4361ee; }
+    .card:nth-child(2) { border-left-color: #4cc9f0; }
+    .card:nth-child(3) { border-left-color: #f72585; }
+    .card:nth-child(4) { border-left-color: #7209b7; }
+
+    .card-icon {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-size: 40px;
+      opacity: 0.2;
+      color: var(--primary);
+    }
+
+    .card p {
+      color: var(--gray);
+      font-size: 14px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .card h3 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+
+    .card .trend {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card .trend.up {
+      color: #2ecc71;
+    }
+
+    .card .trend.down {
+      color: #e74c3c;
+    }
+
+    /* Content Layout */
+    .content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1200px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .box {
+      background: white;
+      border-radius: var(--card-radius);
+      padding: 25px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .box h4 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .box h4 i {
+      color: var(--primary);
+    }
+
+    /* Chart */
+    .chart-container {
+      position: relative;
+      height: 280px;
+      margin-top: 10px;
+    }
+
+    /* Activity */
+    .activity ul {
+      list-style: none;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      background: linear-gradient(45deg, var(--primary-light), var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+
+    .activity-details {
+      flex-grow: 1;
+    }
+
+    .activity-details p {
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .activity-time {
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    /* Schedule */
+    .schedule {
+      margin-top: 10px;
+    }
+
+    .schedule-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px;
+      background: var(--light);
+      border-radius: 10px;
+      margin-bottom: 15px;
+      transition: var(--transition);
+    }
+
+    .schedule-item:hover {
+      background: #e3f2fd;
+      transform: translateX(5px);
+    }
+
+    .schedule-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .schedule-time {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .schedule-course {
+      font-weight: 500;
+      margin-top: 5px;
+      color: var(--dark);
+    }
+
+    .schedule-location {
+      background: var(--primary);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main {
+        margin-left: 0 !important;
+      }
+      
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .main {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .header-right {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-qrcode"></i>
+        </div>
+        <div class="logo-text">
+          <h3>AbsensiQR</h3>
+          <p>Admin Panel</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile">
+      <div class="profile-img">A</div>
+      <div class="profile-info">
+        <h4>Admin</h4>
+        <p>Administrator</p>
+      </div>
+    </div>
+
+    <div class="sidebar-menu">
+      <a href="dashboard_admin.html" class="active">
+        <i class="fas fa-tachometer-alt"></i>
+        <span class="menu-text">Dashboard</span>
+      </a>
+      <a href="daftar_hadir.html">
+        <i class="fas fa-list-check"></i>
+        <span class="menu-text">Lihat Daftar Hadir</span>
+      </a>
+      <a href="kelola_data_pengguna.html">
+        <i class="fas fa-users"></i>
+        <span class="menu-text">Kelola Data Pengguna</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-calendar-alt"></i>
+        <span class="menu-text">Kelola Jadwal</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-chart-bar"></i>
+        <span class="menu-text">Laporan</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="menu-text">Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="header">
+      <div class="header-left">
+        <h1>Dashboard</h1>
+        <p>Absensi Mahasiswa - Sistem Monitoring Real-time</p>
+      </div>
+      <div class="header-right">
+        <div class="date-display">
+          <i class="far fa-calendar"></i> 
+          <span id="currentDate">Senin, 15 April 2025</span>
+        </div>
+        <button class="toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats">
+      <div class="card">
+        <div class="card-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <p>Total Mahasiswa</p>
+        <h3>1,242</h3>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i> 5.2% dari bulan lalu
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <p>Hadir Hari Ini</p>
+        <h3>892</h3>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i> 12% dari kemarin
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <i class="fas fa-user-times"></i>
+        </div>
+        <p>Tidak Hadir</p>
+        <h3>124</h3>
+        <div class="trend down">
+          <i class="fas fa-arrow-down"></i> 8% dari kemarin
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <i class="fas fa-qrcode"></i>
+        </div>
+        <p>Scan QR Hari Ini</p>
+        <h3>1,023</h3>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i> 15% dari kemarin
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts and Activity -->
+    <div class="content">
+      <!-- Chart Section -->
+      <div class="box">
+        <h4><i class="fas fa-chart-line"></i> Grafik Kehadiran Mingguan</h4>
+        <div class="chart-container">
+          <canvas id="attendanceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Activity Section -->
+      <div class="box activity">
+        <h4><i class="fas fa-bell"></i> Aktivitas Terbaru</h4>
+        <ul>
+          <li class="activity-item">
+            <div class="activity-icon">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <div class="activity-details">
+              <p>Mahasiswa melakukan absensi</p>
+              <div class="activity-time">1 menit yang lalu</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <div class="activity-details">
+              <p>Mahasiswa melakukan absensi</p>
+              <div class="activity-time">2 menit yang lalu</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon">
+              <i class="fas fa-user-check"></i>
+            </div>
+            <div class="activity-details">
+              <p>Admin menambahkan jadwal baru</p>
+              <div class="activity-time">5 menit yang lalu</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon">
+              <i class="fas fa-download"></i>
+            </div>
+            <div class="activity-details">
+              <p>Laporan bulanan diekspor</p>
+              <div class="activity-time">10 menit yang lalu</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Schedule Section -->
+    <div class="box schedule">
+      <h4><i class="fas fa-calendar-day"></i> Jadwal Hari Ini</h4>
+      <div class="schedule-item">
+        <div>
+          <div class="schedule-time">08.00 - 09.40</div>
+          <div class="schedule-course">Pemrograman Web</div>
+        </div>
+        <div class="schedule-location">Lab Komp. 1</div>
+      </div>
+      <div class="schedule-item">
+        <div>
+          <div class="schedule-time">10.00 - 11.40</div>
+          <div class="schedule-course">Basis Data</div>
+        </div>
+        <div class="schedule-location">Ruang A</div>
+      </div>
+      <div class="schedule-item">
+        <div>
+          <div class="schedule-time">13.00 - 14.40</div>
+          <div class="schedule-course">Data Science</div>
+        </div>
+        <div class="schedule-location">Ruang B</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set current date
+  const currentDate = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('currentDate').textContent = currentDate.toLocaleDateString('id-ID', options);
+
+  // Toggle sidebar
+  const toggleSidebarBtn = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+  
+  toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    
+    // Change icon
+    const icon = toggleSidebarBtn.querySelector('i');
+    if (sidebar.classList.contains('collapsed')) {
+      icon.classList.remove('fa-bars');
+      icon.classList.add('fa-chevron-right');
+    } else {
+      icon.classList.remove('fa-chevron-right');
+      icon.classList.add('fa-bars');
+    }
+  });
+
+  // Logout button
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (confirm('Apakah Anda yakin ingin logout?')) {
+      alert('Anda berhasil logout. Redirecting to login page...');
+      // In a real app, you would redirect to login page
+      // window.location.href = 'login.html';
+    }
+  });
+
+  // Chart.js Implementation
+  const ctx = document.getElementById('attendanceChart').getContext('2d');
+  
+  // Data for the chart
+  const attendanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+      datasets: [
+        {
+          label: 'Hadir',
+          data: [820, 850, 830, 890, 892, 300, 150],
+          borderColor: '#4361ee',
+          backgroundColor: 'rgba(67, 97, 238, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'Tidak Hadir',
+          data: [150, 120, 140, 110, 124, 50, 30],
+          borderColor: '#f72585',
+          backgroundColor: 'rgba(247, 37, 133, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              size: 12
+            },
+            padding: 20
+          }
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          beginAtZero: true,
+          max: 1000,
+          ticks: {
+            stepSize: 200
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'nearest'
+      }
+    }
+  });
+
+  // Mobile menu toggle for smaller screens
+  function checkScreenSize() {
+    if (window.innerWidth <= 992) {
+      sidebar.classList.remove('collapsed');
+      sidebar.classList.add('active');
+      toggleSidebarBtn.querySelector('i').classList.add('fa-times');
+      toggleSidebarBtn.querySelector('i').classList.remove('fa-bars');
+    } else {
+      sidebar.classList.remove('active');
+    }
+  }
+  
+  // Initial check
+  checkScreenSize();
+  
+  // Listen for resize
+  window.addEventListener('resize', checkScreenSize);
+
+  // Simulate real-time updates
+  setInterval(() => {
+    // Randomly update attendance numbers
+    const presentElement = document.querySelector('.card:nth-child(2) h3');
+    const absentElement = document.querySelector('.card:nth-child(3) h3');
+    const scanElement = document.querySelector('.card:nth-child(4) h3');
+    
+    // Small random fluctuations
+    let present = parseInt(presentElement.textContent.replace(',', ''));
+    let absent = parseInt(absentElement.textContent.replace(',', ''));
+    let scan = parseInt(scanElement.textContent.replace(',', ''));
+    
+    // Random changes (for demo purposes)
+    present += Math.floor(Math.random() * 3);
+    absent += Math.floor(Math.random() * 2);
+    scan += Math.floor(Math.random() * 5);
+    
+    // Update the display
+    presentElement.textContent = present.toLocaleString();
+    absentElement.textContent = absent.toLocaleString();
+    scanElement.textContent = scan.toLocaleString();
+  }, 10000); // Update every 10 seconds
+</script>
+</body>
+</html>
