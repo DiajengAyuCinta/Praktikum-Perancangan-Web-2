@@ -13,14 +13,14 @@ try {
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';        // ganti sesuai SMTP kamu
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'diajencinta@gmail.com';   // ganti email SMTP
-    $mail->Password   = 'qbqepxqmbfrjpnot';         // ganti password SMTP / APP PASSWORD
+    $mail->Username   = 'emailkamu@gmail.com';   // ganti email SMTP
+    $mail->Password   = '';         // ganti password SMTP / APP PASSWORD
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 
     // sender & receiver
-    $mail->setFrom('diajencinta@gmail.com', 'APK Absensi Mahasiswa');
-    $mail->addAddress('diajencinta@email.com', 'Diajeng Ayu Cinta');
+    $mail->setFrom('emailkamu@gmail.com', 'nama_apk');
+    $mail->addAddress('email_penerima@email.com', 'nama_penerima');
 
     // OPTIONAL: Jika tidak butuh, hapus agar tidak error
     // $mail->addReplyTo('info@example.com', 'Information');
@@ -38,3 +38,4 @@ try {
 } catch (Exception $e) {
     echo "Email gagal dikirim. Error: {$mail->ErrorInfo}";
 }
+
