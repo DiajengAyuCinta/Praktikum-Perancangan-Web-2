@@ -33,13 +33,13 @@ if ($result->num_rows > 0) {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'diajencinta@gmail.com';
-            $mail->Password   = 'qbqepxqmbfrjpnot';
+            $mail->Username   = 'emailkamu@gmail.com';
+            $mail->Password   = ''; //app password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
-            $mail->setFrom('diajencinta@gmail.com', 'APK Absensi Mahasiswa');
-            $mail->addAddress($row['email'], $row['Diajeng Ayu Cinta']);
+            $mail->setFrom('emailkamu@gmail.com', 'nama_apk');
+            $mail->addAddress($row['email'], $row['nama_penerima']);
 
             $mail->isHTML(true);
             $mail->Subject = 'Verifikasi Login Anda';
@@ -78,3 +78,4 @@ if ($result->num_rows > 0) {
 
 $conn->close();
 ?>
+
